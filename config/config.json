@@ -1,0 +1,10 @@
+{
+ "baseURL": "https://www.google.com",
+ "timeout": 30000,
+ "headless": true,
+ "viewport": {
+   "width": 1920,
+   "height": 1080
+ },
+ "reportPath": "./reports/"
+}

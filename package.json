@@ -1,0 +1,12 @@
+{
+    "name":"automation-framework",
+    "version": "1.0.0",
+    "scripts": {
+        "test": "playwright test",
+        "test:headed": "HEADLESS=false playwright test",
+        "report":"playwright show-report"
+    },
+    "dependencies": {
+        "@playwright/test": "^1.54.1"
+    }
+}
