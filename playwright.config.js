@@ -1,3 +1,4 @@
+import {devices} from '@playwright/test'
 const config = require('./config/config.json');
 
 module.exports = {
@@ -5,23 +6,24 @@ module.exports = {
  outputDir: config.reportPath,
  use: {
    headless: config.headless,
-   viewport: config.viewport,
-   screenshot: 'only-on-failure',
+   screenshot:{
+    mode: 'only-on-failure',
+    fullPage:true,
+   },
    video: 'retain-on-failure',
    trace: 'retain-on-failure'
  },
  reporter: [
-   ['list'],
    ['html', { outputFolder: config.reportPath ,open:'never'}]
  ],
  projects: [
-   {
-     name: 'chromium',
-     use: { browserName: 'chromium' },
-   },
-   {
-     name: 'firefox',
-     use: { browserName: 'firefox' },
-   }
+  {
+    name: 'chromium',
+    use:{...devices['Desktop Chrome'],
+      launchOptions:{
+        args:['--start-maximized'],
+      }
+    }
+  }
  ]
 };

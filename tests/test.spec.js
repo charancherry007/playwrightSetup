@@ -1,38 +1,30 @@
-import { test, expect } from '@playwright/test';
-import LoginPageMethods from '../pageMethods/homePage.js';
-import * as navUtils from '../utils/navUtil.js';
-import * as reportingUtils from '../utils/reportingUtil.js';
+import {test,expect} from '@playwright/test';
+import MethodsMap from '../PageMethods/MethodsMap';
+import PageMaps from '../PageObjects/PageMaps';
 
- let loginPage;
- let page;
 
- test.beforeAll(async ({ browser }) => {
-   const context = await browser.newContext();
-   page = await context.newPage();
-   loginPage = new LoginPageMethods(page);
-   await navUtils.navigate(page, '');
- });
- test('Successful login', async () => {
-   try {
-     /**
-      * Test implementation
-      */
-   } catch (error) {
-     //await reportingUtils.captureScreenshot(test.info(), page);
-     throw error;
-   }
- });
- test('Failed login', async () => {
-   try {
-     await loginPage.verifyLoginPage();
-     await loginPage.login('invalid', 'credentials');
-     const error = await loginPage.getErrorMessage();
-     expect(error).toContain('Invalid credentials');
-   } catch (error) {
-     //await reportingUtils.captureScreenshot(test.info(), page);
-     throw error;
-   }
- });
- test.afterAll(async () => {
-   //await reportingUtils.generateHTMLReport();
- });
+test.describe('Test case description',() =>{
+
+    let Pages;
+    let Methods;
+    let page;
+
+    test.beforeEach(async ({browser})=>{
+        const context = await browser.newContext();
+        page = await context.newPage();
+        Pages = new PageMaps(page);
+        Methods = new MethodsMap(page);
+        await Methods.LoginMethods.naviagteTo('https://www.demoshop.com.tr/login'); 
+        await page.bringToFront();
+        await page.setViewportSize({ width: 1920, height: 1080 });
+    });
+
+    test('Test Case Name..', async()=>{
+        expect(await Methods.LoginMethods.signIn('usernmae','password')).toBeTruthy();
+    });
+
+    test.afterEach(async()=>{
+        await page.close();
+    });
+
+});
