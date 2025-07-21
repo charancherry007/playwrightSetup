@@ -21,6 +21,7 @@ test.describe('Test case description',() =>{
 
     test('Test Case Name..', async()=>{
         expect(await Methods.LoginMethods.signIn('usernmae','password')).toBeTruthy();
+        expect(await Methods.LoginMethods.searchAndSelectOrderType('order Number')).toBeTruthy();
     });
 
     test.afterEach(async()=>{
