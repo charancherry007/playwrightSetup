@@ -1,19 +1,15 @@
 const OpenAI = require('openai');
 const path = require('path');
-const { BedrockClient, GenerateCommand } = require("@aws-sdk/client-bedrock");
+
 
 /**
  * BedrockClient configuration
  * Make sure to set up your AWS credentials and region correctly.
  */
-const config = {
-  credentials: {
-    accessKeyId: "YOUR_AWS_ACCESS_KEY",
-    secretAccessKey: "YOUR_AWS_SECRET_KEY"
-  },
-  region: "us-east-1"
-};
-const bedrockClient = new BedrockRuntimeClient(config);
+const openai = new OpenAI({
+  apiKey: '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',
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+})
 
 class SelfHeal {
   /**
@@ -79,7 +75,7 @@ ${locator}
 New DOM:
 ${newDOM}
 
-Respond with only the new locator string.
+Respond with only one locator string which best suits the original intent and also Dont give any explanation.
     `.trim();
   }
 
@@ -89,20 +85,27 @@ Respond with only the new locator string.
    * @returns {Promise<string>}
    */
   async queryAI(prompt) {
-   try {
-    const params = {
-      model: "claude3", // Update with your specific model name/ARN if different
-      input: {
-        text: prompt,
-         max_tokens: 200
-      }
-    };
-    const response = await bedrockClient.send(new InvokeModelCommand(params));
-    return response.output.text;
-  } catch (error) {
-    console.error("Error invoking Bedrock model:", error);
-    throw error;
+     let val = '';
+    try {
+        const completion = await openai.chat.completions.create({
+    model: "nvidia/llama-3.1-nemotron-70b-instruct",
+    messages: [{"role":"user","content":prompt}],
+    temperature: 0.5,
+    top_p: 1,
+    max_tokens: 4096,
+    stream: true
+  })
+   
+  for await (const chunk of completion) {
+    process.stdout.write(chunk.choices[0]?.delta?.content || '')
+    val += chunk.choices[0]?.delta?.content
   }
+  console.log(`AI response: ${val}`);
+  return val;
+    } catch (error) {
+      console.error("Error invoking Bedrock model:", error);
+      throw error;
+    }
   }
 
 }

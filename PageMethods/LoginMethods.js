@@ -20,6 +20,7 @@ class LoginMethods {
 
   async captureDOM() {
     try {
+      await this.page.waitForTimeout(5000);
       const pageTitle = await this.page.title();
       const rootDir = path.resolve(__dirname, '..');
       const domStoragePath = path.join(rootDir, 'DOM-Snapshots');
