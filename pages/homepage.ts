@@ -60,6 +60,7 @@ async navigateTo(url?: string) {
         await this.passwordField.fill(password);
         await this.loginBtn.click();
         await this.page.waitForNavigation({ waitUntil: 'networkidle' });
+        if(this.page.url())
         if (this.page.url() !== 'expectedDashboardUrl') {
             console.log(`Login failed. Current URL is ${this.page.url()}`);
             return false;

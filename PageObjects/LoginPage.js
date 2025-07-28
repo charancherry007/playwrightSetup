@@ -2,7 +2,7 @@ class LoginPage{
     
     constructor(page){
         this.page = page;
-        this.usernameField = page.locator('//nput[@name="email"]');
+        this.usernameField = page.locator('//div[@type="radio"]');
         this.passwordField = page.locator('//input[@name="password"]');
         this.loginBtn = page.locator('//button[@type="submit"]');
         this.hamburgerMenu = page.locator('//button[@aria-label="Open navigation menu"]');
