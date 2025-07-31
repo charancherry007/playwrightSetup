@@ -87,7 +87,7 @@ class LoginMethods {
   async signIn(username, password) {
     try {
       await this.page.waitForTimeout(2000);
-      if (this.Pages.LoginPage.usernameField.isVisible()) {
+      
         await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.usernameField, username, 'Email Field');
         await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.passwordField, password, 'Password Field');
         await CommonMethods.clickFunction(this.page, this.Pages.LoginPage.loginBtn, 'Login Button')
@@ -99,10 +99,7 @@ class LoginMethods {
           console.log('User Name Input field not found');
           return false;
         }
-      } else {
-        console.log('Login Button not found');
-        return false;
-      }
+    
     } catch (err) {
       console.log('Error Performing Login Action ', err);
       return false;
@@ -135,7 +132,34 @@ class LoginMethods {
       return false;
     }
   }
+
+//---------------------------------------------------------------//
+  /**
+   * Method to Navigate to Order Entry Page.
+   */
+  async navigateToOrderEntryPage(SearchOption: String) {
+    try {
+      await this.hamburgerMenu.click();
+      if(await this.searchField.isVisible()) {
+        await this.searchField.fill(SearchOption);
+        await this.page.keyboard.press('Enter');
+        await this.page.waitForTimeout(2000);
+        const orderEntryLocator = `//span[contains(text(), "${SearchOption}")] `;
+        if (await this.page.locator(orderEntryLocator).isVisible()) {
+          this.page.locator(orderEntryLocator).click();
+          console.log(`Navigated to ${SearchOption} Page Successfully`);
+          return true;
+        } else {
+          console.log(`${SearchOption} Link not found`);
+          return false;
+        }
+      }
+    } catch (err) {
+      console.log(`Error Navigating to ${SearchOption} Page `, err);
+      return false;
+    }
 }
 
+//---------------------------------------------------------------//
 
 export default LoginMethods;
