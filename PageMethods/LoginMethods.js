@@ -118,6 +118,7 @@ class LoginMethods {
       await this.page.waitForTimeout(2000);
       await this.page.keyboard.press('Enter');
       await this.page.waitForTimeout(2000);
+      this.navigateToOrderEntryPage(orderType);
       const orderTypeLocator = `//span[contains(text(), '${orderType}')]`;
       if (!(await this.page.locator(orderTypeLocator).isVisible())) {
         console.log(`Order type ${orderType} not found.`);
@@ -133,33 +134,34 @@ class LoginMethods {
     }
   }
 
-//---------------------------------------------------------------//
+/**---------------------------------------------------- */
   /**
-   * Method to Navigate to Order Entry Page.
+   * Search for an account with specified search type.
    */
-  async navigateToOrderEntryPage(SearchOption: String) {
+  async searchAccount(searchType, searchValue) {
     try {
-      await this.hamburgerMenu.click();
-      if(await this.searchField.isVisible()) {
-        await this.searchField.fill(SearchOption);
-        await this.page.keyboard.press('Enter');
-        await this.page.waitForTimeout(2000);
-        const orderEntryLocator = `//span[contains(text(), "${SearchOption}")] `;
-        if (await this.page.locator(orderEntryLocator).isVisible()) {
-          this.page.locator(orderEntryLocator).click();
-          console.log(`Navigated to ${SearchOption} Page Successfully`);
-          return true;
-        } else {
-          console.log(`${SearchOption} Link not found`);
-          return false;
-        }
+      await this.accountSearchBox.click();
+      await this.accounSearchBtn.click();
+      const searchTypeLocator = `//li[@role='option']//p[contains(text(), '${searchType}')]`;
+      await this.page.locator(searchTypeLocator).click();
+      await this.accountSearchBox.fill(searchValue);
+      const  accountRow = `//tr[1]/td//div[text()='${searchValue}']`;
+      if(await this.page.locator(accountRow).isVisible()) {
+        console.log(`Account ${searchValue} found successfully.`);
+        await this.page.locator(accountRow).click();
+      }else{
+        console.log(`Account ${searchValue} not found.`);
+        return false;
       }
+      return true;
     } catch (err) {
-      console.log(`Error Navigating to ${SearchOption} Page `, err);
+      console.log('Error Searching Account ', err);
       return false;
     }
 }
 
-//---------------------------------------------------------------//
+/**------------------------------------------------------ */
+
+}
 
 export default LoginMethods;

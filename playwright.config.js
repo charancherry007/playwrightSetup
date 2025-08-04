@@ -18,12 +18,29 @@ module.exports = {
  ],
  projects: [
   {
-    name: 'chromium',
-    use:{...devices['Desktop Chrome'],
-      launchOptions:{
-        args:['--start-maximized'],
+      name: 'Microsoft Edge',
+      use: { ...devices['Desktop Edge'], 
+        channel: 'msedge',
+        permissions: [
+          'geolocation',
+          'notifications',
+          'camera',
+          'microphone',
+          'clipboard-read',
+          'clipboard-write',
+          'background-sync',
+          'midi',
+          'midi-sysex',
+          'payment-handler'
+        ],
+        launchOptions: {
+          args: [    '--start-maximized',
+    '--disable-web-security',
+    '--disable-features=PermissionPrompt']
+        },
+        viewport:null,
+        deviceScaleFactor: undefined
       }
     }
-  }
  ]
 };
