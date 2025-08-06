@@ -17,8 +17,8 @@ class HomePage {
      */
 constructor(page: Page){
         this.page = page;
-        this.usernameField = page.locator('//input[@name="email"]');
-        this.passwordField = page.locator('//input[@name="password"]');
+        this.usernameField = page.locator('//input[@placeholder="Username/Email"]');
+        this.passwordField = page.locator('//input[@placeholder="Password"]');
         this.loginBtn = page.locator('//button[@type="submit"]');
         this.hamburgerMenu = page.locator('//button[@aria-label="Open navigation menu"]');
         this.searchField = page.locator('//input[@placeholder="Search..."]');
@@ -56,18 +56,18 @@ async navigateTo(url?: string) {
      */
     async login(username: string, password: string) {
         await this.page.waitForTimeout(5000);
+
+        if (await this.usernameField.isVisible()) {
         await this.usernameField.fill(username);
+        console.log("Username field is visible");
+    } else {
+        console.log("Username field is not visible");
+        return false;
+    }
         await this.passwordField.fill(password);
         await this.loginBtn.click();
         await this.page.waitForNavigation({ waitUntil: 'networkidle' });
-        if(this.page.url())
-        if (this.page.url() !== 'expectedDashboardUrl') {
-            console.log(`Login failed. Current URL is ${this.page.url()}`);
-            return false;
-        }else {
-            console.log(`Successfully logged in as ${username}`);
-            return true;
-        }
+       
     }
 
     /**
@@ -100,5 +100,109 @@ async navigateTo(url?: string) {
             console.log("Search field is not visible");
         }
     }
+
+    /**------------------------------------------(06/08)---------------------------------------------- */
+
+    /**
+     * symbolField: Locator;
+     * actionsDropdown: Locator;
+     * quantityField: Locator;
+     * orderTypeDropdown: Locator;
+     * stopPriceField: Locator;
+     * limitPiceField: Locator;
+     * timeInForceDropdown: Locator;
+     * dateField: Locator;
+     * estimateNetAmountField: Locator;
+     * symbolPriceField: :Locator;
+     * 
+     * this.symbolField = page.locator('//input[@placeholder="Symbol"]');
+     * this.actionsDropdown = page.locator('//select[@name="action"]');
+     * this.quantityField = page.locator('//input[@placeholder="Quantity"]');
+     * this.orderTypeDropdown = page.locator('//select[@name="orderType"]');
+     * this.stopPriceField = page.locator('//input[@placeholder="Stop Price"]');
+     * this.limitPiceField = page.locator('//input[@placeholder="Limit Price"]');
+     * this.timeInForceDropdown = page.locator('//select[@name="timeInForce"]');
+     * this.dateField = page.locator('//input[@placeholder="Date"]');
+     * this.estimateNetAmountField = page.locator('//span[@id="estimatedNetAmount"]');
+     * this.symbolPriceField = page.locator('//span[@id="symbolPrice"]');
+     * 
+     * This method is used to enter order details.
+     * 
+     */
+    async enterOrderDetails(symbolValue: string, actionValue: string, quantity: number) {
+        
+        
+        await this.symbolField.fill(symbolValue);
+        const symbolLocator = this.page.locator('//span[contains(text(), "' + symbolValue + '")]');
+        await symbolLocator.click();
+        await this.page.waitForTimeout(2000);
+
+        const price: number = await this.symbolPriceField.textContent().trim().replace('$', '').replace(',', ''); 
+        await this.actionsDropdown.selectOption({ label: 'Buy' });
+        /**
+         * if the dropdown select is not available then use the below code
+         * await this.actionsDropdown.click();
+         * const buyOption = this.page.locator('//li[contains(text(), "Buy")]');
+         * await buyOption.click();
+         */
+        await this.page.waitForTimeout(2000);
+
+        await this.quantityField.fill(quantity);
+        await this.page.waitForTimeout(2000);
+
+        await this.orderTypeDropdown.selectOption({ label: 'Buy' });
+        /**
+         * if the dropdown select is not available then use the below code
+         * await this.orderTypeDropdown.click();
+         * const orderOption = this.page.locator('//li[contains(text(), "Buy")]');
+         * await orderOption.click();
+         */
+        await this.page.waitForTimeout(2000);
+
+        await this.stopPriceField.fill(price+1); 
+        await this.page.waitForTimeout(2000);
+
+        await this.limitPiceField.fill(price+2); 
+        await this.page.waitForTimeout(2000);
+
+        await this.timeInForceDropdown.selectOption({ label: 'Buy' });
+        /**
+         * if the dropdown select is not available then use the below code
+         * await this.timeInForceDropdown.click();
+         * const buyOption = this.page.locator('//li[contains(text(), "Buy")]');
+         * await buyOption.click();
+         */
+        await this.page.waitForTimeout(2000);
+
+        await this.dateField.fill(await this.getFutureDate(1)); // Get next date
+        await this.page.waitForTimeout(2000);
+
+        const estNetAmount: number = await this.estimateNetAmountField.textContent().trim().replace('$', '').replace(',', '');
+        if(estNetAmount=== quantity * (price+2)) {
+            console.log("Estimated Net Amount is correct");
+        }
+        else { 
+            console.log("Estimated Net Amount is incorrect");
+            throw new Error(`Expected Estimated Net Amount to be ${quantity * (price+2)}, but got ${estNetAmount}`);
+        }
+
+    }
+
+    /**
+     * This method is used to get fututre date.
+     * It returns a string representing the date in the format 'MM/DD/YYYY'. 
+    */
+   async getFutureDate(days: number = 1): Promise<string> {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const yyyy = tomorrow.getFullYear();
+        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const dd = String(tomorrow.getDate()).padStart(2, '0');
+        const tomorrowStr = `${yyyy}-${mm}-${dd}`;
+        return tomorrowStr;
+   }
+
+   /**--------------------------------------------------------------------------------------------------------------- */
 }
 export default HomePage;
