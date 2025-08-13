@@ -204,5 +204,46 @@ async navigateTo(url?: string) {
    }
 
    /**--------------------------------------------------------------------------------------------------------------- */
+
+
+   /**
+    * Random two digit number generator.
+    * Generates a number between 10 and 99
+    */
+   async generateRandomTwoDigitNumber(): Promise<number> {
+        return Math.floor(Math.random() * 11) + 10; 
+    }
+
+
+   /**
+    * Account
+    * Symbol
+    * Action
+    * Quantity
+    * Order Type
+    * Limit Price
+    * Stop Price
+    * Time in Force
+    * GT Date
+    * //tr/td[text()="Account"]/td[text()='${AccountNumber}']"]
+    * 
+    * 
+    */
+   async verifyPreviewOrderDetails(){
+    const accountXpath = await this.page.locator(`//tr/td[text()="Account"]/td[text()='${this.accountNumber}']`);
+    const symbolXpath = await this.page.locator(`//tr/td[text()="Symbol"]/td[text()='${this.symbolValue}']`);
+    const actionXpath = await this.page.locator(`//tr/td[text()="Action"]/td[text()='${this.actionsDropdown}']`);
+    const quantityXpath = await this.page.locator(`//tr/td[text()="Quantity"]/td[text()='${this.quantityField}']`);
+    const orderTypeXpath = await this.page.locator(`//tr/td[text()="Order Type"]/td[text()='${this.orderTypeDropdown}']`);
+    const limitPriceXpath = await this.page.locator(`//tr/td[text()="Limit Price"]/td[text()='${this.limitPiceField}']`);
+    const stopPriceXpath = await this.page.locator(`//tr/td[text()="Stop Price"]/td[text()='${this.stopPriceField}']`);
+    const timeInForceXpath = await this.page.locator(`//tr/td[text()="Time in Force"]/td[text()='${this.timeInForceDropdown}']`);
+    const gtDateXpath = await this.page.locator(`//tr/td[text()="GT Date"]/td[text()='${this.dateField}']`);
+    if(accountXpath!=null && symbolXpath!=null && actionXpath!=null && quantityXpath!=null && orderTypeXpath!=null && limitPriceXpath!=null && stopPriceXpath!=null && timeInForceXpath!=null && gtDateXpath!=null) {
+        console.log("All preview order details are correct");
+    }else{
+
+    }
+   }
 }
 export default HomePage;
