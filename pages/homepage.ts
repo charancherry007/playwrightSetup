@@ -276,6 +276,7 @@ async navigateTo(url?: string) {
         }
     }
 
+    //li[@class='icon-application']//parent::span//parent::div//parent::li
     /**---------------------------------------------------------------------------- */
 }
 export default HomePage;
