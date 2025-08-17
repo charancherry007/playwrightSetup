@@ -20,6 +20,7 @@ constructor(page: Page){
         this.usernameField = page.locator('//input[@placeholder="Username/Email"]');
         this.passwordField = page.locator('//input[@placeholder="Password"]');
         this.loginBtn = page.locator('//button[@type="submit"]');
+        
         this.hamburgerMenu = page.locator('//button[@aria-label="Open navigation menu"]');
         this.searchField = page.locator('//input[@placeholder="Search..."]');
         /**
@@ -56,7 +57,9 @@ async navigateTo(url?: string) {
      */
     async login(username: string, password: string) {
         await this.page.waitForTimeout(5000);
-
+        await this.waitForElementAndClick(this.usernameField); 
+        await this.waitForElementAndFill(this.usernameField, username);
+        
         if (await this.usernameField.isVisible()) {
         await this.usernameField.fill(username);
         console.log("Username field is visible");
@@ -66,6 +69,7 @@ async navigateTo(url?: string) {
     }
         await this.passwordField.fill(password);
         await this.loginBtn.click();
+        await this.waitForElementAndClick(this.loginBtn); 
         await this.page.waitForNavigation({ waitUntil: 'networkidle' });
        
     }
@@ -245,5 +249,33 @@ async navigateTo(url?: string) {
 
     }
    }
+   /**
+    * Use it to wait for an element to be visible and then click on it.
+    * Use it to wait for an element to be visible and then fill it with a value.
+    */
+
+   async waitForElementAndClick(locator: Locator, timeout: number = 5000) {
+        try {
+            await locator.waitFor({ state: 'visible', timeout });
+            await locator.click();
+            console.log(`Clicked on element: ${await locator.textContent()}`);
+        } catch (error) {
+            console.error(`Failed to click on element: ${await locator.textContent()}`, error);
+            throw error;
+        }
+   }
+
+   async waitForElementAndFill(locator: Locator, value: string, timeout: number = 5000) {
+        try {
+            await locator.waitFor({ state: 'visible', timeout });
+            await locator.fill(value);
+            console.log(`Filled element with value: ${value}`);
+        } catch (error) {
+            console.error(`Failed to fill element with value: ${value}`, error);
+            throw error;
+        }
+    }
+
+    /**---------------------------------------------------------------------------- */
 }
 export default HomePage;
