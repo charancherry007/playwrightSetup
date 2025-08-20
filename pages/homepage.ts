@@ -4,6 +4,7 @@ dotenv.config({ path: './env/dev.env' });
 
 class HomePage {
     page: Page;
+    
     usernameField: Locator;
     passwordField: Locator;
     loginBtn: Locator;
@@ -71,7 +72,7 @@ async navigateTo(url?: string) {
         await this.loginBtn.click();
         await this.waitForElementAndClick(this.loginBtn); 
         await this.page.waitForNavigation({ waitUntil: 'networkidle' });
-       
+       await this.page.frame('//')?.locator
     }
 
     /**
@@ -277,6 +278,45 @@ async navigateTo(url?: string) {
     }
 
     //li[@class='icon-application']//parent::span//parent::div//parent::li
+    /**---------------------------------------------------------------------------- */
+
+    /**
+     * This method is used to find all the iframes on the page and use the selector to find the element inside the iframe. and click on it.
+     * @param selector - The selector to find the element inside the iframe.
+     */
+    async findElementInIframe(selector: string) {
+        const frames = this.page.frames();
+        for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.waitForSelector(selector, { state: 'visible' });
+            const element = frame.locator(selector);
+            if (element) {
+                await element.click();
+                console.log(`Clicked on element in iframe: ${selector}`);
+                return;
+            }
+        }
+        console.error(`Element not found in any iframe: ${selector}`);
+    }
+
+    /**
+     * This method is used to find all the iframes on the page and use the selector to find the element inside the iframe. and fill it with value.
+     * @param selector - The selector to find the element inside the iframe.
+     */
+    async fillElementInIframe(selector: string, value: string) {
+        const frames = this.page.frames();
+        for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.waitForSelector(selector, { state: 'visible' });
+            const element = frame.locator(selector);
+            if (element) {
+                await element.fill(value);
+                console.log(`Filled element in iframe with value: ${value}`);
+                return;
+            }
+        }
+        console.error(`Element not found in any iframe: ${selector}`);
+    }
     /**---------------------------------------------------------------------------- */
 }
 export default HomePage;
