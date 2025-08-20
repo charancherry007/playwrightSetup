@@ -361,5 +361,26 @@ async navigateTo(url?: string) {
         return false;
     }
 
+    /**
+     * This method is used to select a value from a dropdown inside an iframe.
+     * @param selector - The selector to find the dropdown element inside the iframe.
+     * @param value - The value to select from the dropdown.
+     */
+    async selectValueFromDropdownInIframe(selector: string, value: string) {
+        await this.page.waitForLoadState('domcontentloaded');
+        const frames = this.page.frames();
+        for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+            const dropdown = frame.locator(selector);
+            if (dropdown!== null) {
+                await dropdown.selectOption({ label: value });
+                console.log(`Selected value "${value}" from dropdown in iframe: ${selector}`);
+                return;
+            }
+        }
+        console.error(`Dropdown not found in any iframe: ${selector}`);
+    }
+
 }
 export default HomePage;
