@@ -304,12 +304,13 @@ async navigateTo(url?: string) {
      * @param selector - The selector to find the element inside the iframe.
      */
     async fillElementInIframe(selector: string, value: string) {
+        await this.page.waitForLoadState('domcontentloaded');
         const frames = this.page.frames();
         for (const frame of frames) {
             await frame.waitForLoadState('domcontentloaded');
             await frame.waitForSelector(selector, { state: 'visible' });
             const element = frame.locator(selector);
-            if (element) {
+            if (element!==null) {
                 await element.fill(value);
                 console.log(`Filled element in iframe with value: ${value}`);
                 return;
@@ -318,5 +319,47 @@ async navigateTo(url?: string) {
         console.error(`Element not found in any iframe: ${selector}`);
     }
     /**---------------------------------------------------------------------------- */
+
+    /**
+     * This method is used to get the text from an element inside an iframe.
+     * @param selector - The selector to find the element inside the iframe.
+     */
+    async getTextFromElementInIframe(selector: string): Promise<string> {
+        await this.page.waitForLoadState('domcontentloaded');
+        const frames = this.page.frames();
+        for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+            const element = frame.locator(selector);
+            if (element!== null) {
+                const text = await element.textContent();
+                console.log(`Text from element in iframe: ${text}`);
+                return text || '';
+            }
+        }
+        console.error(`Element not found in any iframe: ${selector}`);
+        return '';        
+    }
+
+    /**
+     * This method is used to verify if an element is visisble inside an iframe.
+     * @param selector - The selector to find the element inside the iframe.
+     */
+    async isElementVisibleInIframe(selector: string): Promise<boolean> {
+        await this.page.waitForLoadState('domcontentloaded');
+        const frames = this.page.frames();
+        for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+            const element = frame.locator(selector);
+            if (await element.isVisible()) {
+                console.log(`Element is visible in iframe: ${selector}`);
+                return true;
+            }
+        }
+        console.error(`Element not found or not visible in any iframe: ${selector}`);
+        return false;
+    }
+
 }
 export default HomePage;
