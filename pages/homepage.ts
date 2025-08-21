@@ -284,17 +284,32 @@ async navigateTo(url?: string) {
      * This method is used to find all the iframes on the page and use the selector to find the element inside the iframe. and click on it.
      * @param selector - The selector to find the element inside the iframe.
      */
-    async findElementInIframe(selector: string) {
+    async clickElementInIframe(selector: string) {
+        await this.page.waitForLoadState('domcontentloaded');
         const frames = this.page.frames();
-        for (const frame of frames) {
+        if( frames.length !== 0) {
+            const frame = frames[length - 1]; 
             await frame.waitForLoadState('domcontentloaded');
-            await frame.waitForSelector(selector, { state: 'visible' });
-            const element = frame.locator(selector);
-            if (element) {
+            await frame.locator(selector).waitFor({ state: 'visible', timeout: 5000 });
+            const element: Locator = frame.locator(selector);
+            if (!await element.isHidden()) {
                 await element.click();
+                await this.page.waitForLoadState('domcontentloaded');
                 console.log(`Clicked on element in iframe: ${selector}`);
                 return;
             }
+        }else{
+            for (const frame of frames) {
+            await frame.waitForLoadState('domcontentloaded');
+            await frame.locator(selector).waitFor({ state: 'visible', timeout: 5000 });
+            const element: Locator = frame.locator(selector);
+            if (!await element.isHidden()) {
+                await element.click();
+                await this.page.waitForLoadState('domcontentloaded');
+                console.log(`Clicked on element in iframe: ${selector}`);
+                return;
+            }
+        }
         }
         console.error(`Element not found in any iframe: ${selector}`);
     }
@@ -334,6 +349,7 @@ async navigateTo(url?: string) {
             if (element!== null) {
                 const text = await element.textContent();
                 console.log(`Text from element in iframe: ${text}`);
+               
                 return text || '';
             }
         }
@@ -350,6 +366,7 @@ async navigateTo(url?: string) {
         const frames = this.page.frames();
         for (const frame of frames) {
             await frame.waitForLoadState('domcontentloaded');
+            
             await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
             const element = frame.locator(selector);
             if (await element.isVisible()) {
@@ -359,6 +376,13 @@ async navigateTo(url?: string) {
         }
         console.error(`Element not found or not visible in any iframe: ${selector}`);
         return false;
+    }
+
+    async validate(){
+        return {
+            isVisible: await this.isElementVisibleInIframe(''),
+            text: await this.getTextFromElementInIframe('')
+        }
     }
 
     /**
