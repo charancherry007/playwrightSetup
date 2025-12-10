@@ -4,24 +4,24 @@ dotenv.config({ path: './env/dev.env' });
 
 class HomePage {
     page: Page;
-    
+
     usernameField: Locator;
     passwordField: Locator;
     loginBtn: Locator;
     hamburgerMenu: Locator;
     searchField: Locator;
-    
+
     /**
      * Constructor for the HomePage class.
      * Initializes locators for various elements on the homepage.
      * @param page - The Playwright Page object representing the current page.
      */
-constructor(page: Page){
+    constructor(page: Page) {
         this.page = page;
         this.usernameField = page.locator('//input[@placeholder="Username/Email"]');
         this.passwordField = page.locator('//input[@placeholder="Password"]');
         this.loginBtn = page.locator('//button[@type="submit"]');
-        
+
         this.hamburgerMenu = page.locator('//button[@aria-label="Open navigation menu"]');
         this.searchField = page.locator('//input[@placeholder="Search..."]');
         /**
@@ -35,18 +35,18 @@ constructor(page: Page){
      * @param url 
      */
 
-async navigateTo(url?: string) {
-    const targetUrl = url || process.env.BASE_URL;
-    if (!targetUrl) {
-        throw new Error('No URL provided and BASE_URL is not set in .env');
+    async navigateTo(url?: string) {
+        const targetUrl = url || process.env.BASE_URL;
+        if (!targetUrl) {
+            throw new Error('No URL provided and BASE_URL is not set in .env');
+        }
+        await this.page.goto(targetUrl);
+        if (this.page.url() !== targetUrl) {
+            throw new Error(`Failed to navigate to ${targetUrl}. Current URL is ${this.page.url()}`);
+        } else {
+            console.log(`Successfully navigated to ${targetUrl}`);
+        }
     }
-    await this.page.goto(targetUrl);
-    if (this.page.url() !== targetUrl) {
-        throw new Error(`Failed to navigate to ${targetUrl}. Current URL is ${this.page.url()}`);
-    } else {
-        console.log(`Successfully navigated to ${targetUrl}`);
-    }
-}
 
     /**
      * This method is used to log in to the application.
@@ -58,34 +58,34 @@ async navigateTo(url?: string) {
      */
     async login(username: string, password: string) {
         await this.page.waitForTimeout(5000);
-        await this.waitForElementAndClick(this.usernameField); 
+        await this.waitForElementAndClick(this.usernameField);
         await this.waitForElementAndFill(this.usernameField, username);
-        
+
         if (await this.usernameField.isVisible()) {
-        await this.usernameField.fill(username);
-        console.log("Username field is visible");
-    } else {
-        console.log("Username field is not visible");
-        return false;
-    }
+            await this.usernameField.fill(username);
+            console.log("Username field is visible");
+        } else {
+            console.log("Username field is not visible");
+            return false;
+        }
         await this.passwordField.fill(password);
         await this.loginBtn.click();
-        await this.waitForElementAndClick(this.loginBtn); 
+        await this.waitForElementAndClick(this.loginBtn);
         await this.page.waitForNavigation({ waitUntil: 'networkidle' });
-       await this.page.frame('//')?.locator
+        await this.page.frame('//')?.locator
     }
 
     /**
      * This method is used to open the hamburger menu.
      * It clicks on the hamburger menu button.
-     */ 
+     */
     async openHamburgerMenu() {
         await this.page.waitForTimeout(5000);
         if (await this.hamburgerMenu.isVisible()) {
             console.log("Hamburger menu is visible");
             await this.hamburgerMenu.click();
             console.log("Hamburger menu opened");
-        }else {
+        } else {
             console.log("Hamburger menu is not visible");
         }
     }
@@ -94,7 +94,7 @@ async navigateTo(url?: string) {
      * This method is used to search for a specific term.
      * It fills in the search field with the provided term and waits for the results to load.
      * @param term 
-     */ 
+     */
     async search(orderType: string) {
         await this.page.waitForTimeout(5000);
         if (await this.searchField.isVisible()) {
@@ -135,14 +135,14 @@ async navigateTo(url?: string) {
      * 
      */
     async enterOrderDetails(symbolValue: string, actionValue: string, quantity: number) {
-        
-        
+
+
         await this.symbolField.fill(symbolValue);
         const symbolLocator = this.page.locator('//span[contains(text(), "' + symbolValue + '")]');
         await symbolLocator.click();
         await this.page.waitForTimeout(2000);
 
-        const price: number = await this.symbolPriceField.textContent().trim().replace('$', '').replace(',', ''); 
+        const price: number = await this.symbolPriceField.textContent().trim().replace('$', '').replace(',', '');
         await this.actionsDropdown.selectOption({ label: 'Buy' });
         /**
          * if the dropdown select is not available then use the below code
@@ -164,10 +164,10 @@ async navigateTo(url?: string) {
          */
         await this.page.waitForTimeout(2000);
 
-        await this.stopPriceField.fill(price+1); 
+        await this.stopPriceField.fill(price + 1);
         await this.page.waitForTimeout(2000);
 
-        await this.limitPiceField.fill(price+2); 
+        await this.limitPiceField.fill(price + 2);
         await this.page.waitForTimeout(2000);
 
         await this.timeInForceDropdown.selectOption({ label: 'Buy' });
@@ -183,12 +183,12 @@ async navigateTo(url?: string) {
         await this.page.waitForTimeout(2000);
 
         const estNetAmount: number = await this.estimateNetAmountField.textContent().trim().replace('$', '').replace(',', '');
-        if(estNetAmount=== quantity * (price+2)) {
+        if (estNetAmount === quantity * (price + 2)) {
             console.log("Estimated Net Amount is correct");
         }
-        else { 
+        else {
             console.log("Estimated Net Amount is incorrect");
-            throw new Error(`Expected Estimated Net Amount to be ${quantity * (price+2)}, but got ${estNetAmount}`);
+            throw new Error(`Expected Estimated Net Amount to be ${quantity * (price + 2)}, but got ${estNetAmount}`);
         }
 
     }
@@ -197,7 +197,7 @@ async navigateTo(url?: string) {
      * This method is used to get fututre date.
      * It returns a string representing the date in the format 'MM/DD/YYYY'. 
     */
-   async getFutureDate(days: number = 1): Promise<string> {
+    async getFutureDate(days: number = 1): Promise<string> {
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -206,56 +206,56 @@ async navigateTo(url?: string) {
         const dd = String(tomorrow.getDate()).padStart(2, '0');
         const tomorrowStr = `${yyyy}-${mm}-${dd}`;
         return tomorrowStr;
-   }
+    }
 
-   /**--------------------------------------------------------------------------------------------------------------- */
+    /**--------------------------------------------------------------------------------------------------------------- */
 
 
-   /**
-    * Random two digit number generator.
-    * Generates a number between 10 and 99
-    */
-   async generateRandomTwoDigitNumber(): Promise<number> {
-        return Math.floor(Math.random() * 11) + 10; 
+    /**
+     * Random two digit number generator.
+     * Generates a number between 10 and 99
+     */
+    async generateRandomTwoDigitNumber(): Promise<number> {
+        return Math.floor(Math.random() * 11) + 10;
     }
 
 
-   /**
-    * Account
-    * Symbol
-    * Action
-    * Quantity
-    * Order Type
-    * Limit Price
-    * Stop Price
-    * Time in Force
-    * GT Date
-    * //tr/td[text()="Account"]/td[text()='${AccountNumber}']"]
-    * 
-    * 
-    */
-   async verifyPreviewOrderDetails(){
-    const accountXpath = await this.page.locator(`//tr/td[text()="Account"]/td[text()='${this.accountNumber}']`);
-    const symbolXpath = await this.page.locator(`//tr/td[text()="Symbol"]/td[text()='${this.symbolValue}']`);
-    const actionXpath = await this.page.locator(`//tr/td[text()="Action"]/td[text()='${this.actionsDropdown}']`);
-    const quantityXpath = await this.page.locator(`//tr/td[text()="Quantity"]/td[text()='${this.quantityField}']`);
-    const orderTypeXpath = await this.page.locator(`//tr/td[text()="Order Type"]/td[text()='${this.orderTypeDropdown}']`);
-    const limitPriceXpath = await this.page.locator(`//tr/td[text()="Limit Price"]/td[text()='${this.limitPiceField}']`);
-    const stopPriceXpath = await this.page.locator(`//tr/td[text()="Stop Price"]/td[text()='${this.stopPriceField}']`);
-    const timeInForceXpath = await this.page.locator(`//tr/td[text()="Time in Force"]/td[text()='${this.timeInForceDropdown}']`);
-    const gtDateXpath = await this.page.locator(`//tr/td[text()="GT Date"]/td[text()='${this.dateField}']`);
-    if(accountXpath!=null && symbolXpath!=null && actionXpath!=null && quantityXpath!=null && orderTypeXpath!=null && limitPriceXpath!=null && stopPriceXpath!=null && timeInForceXpath!=null && gtDateXpath!=null) {
-        console.log("All preview order details are correct");
-    }else{
+    /**
+     * Account
+     * Symbol
+     * Action
+     * Quantity
+     * Order Type
+     * Limit Price
+     * Stop Price
+     * Time in Force
+     * GT Date
+     * //tr/td[text()="Account"]/td[text()='${AccountNumber}']"]
+     * 
+     * 
+     */
+    async verifyPreviewOrderDetails() {
+        const accountXpath = await this.page.locator(`//tr/td[text()="Account"]/td[text()='${this.accountNumber}']`);
+        const symbolXpath = await this.page.locator(`//tr/td[text()="Symbol"]/td[text()='${this.symbolValue}']`);
+        const actionXpath = await this.page.locator(`//tr/td[text()="Action"]/td[text()='${this.actionsDropdown}']`);
+        const quantityXpath = await this.page.locator(`//tr/td[text()="Quantity"]/td[text()='${this.quantityField}']`);
+        const orderTypeXpath = await this.page.locator(`//tr/td[text()="Order Type"]/td[text()='${this.orderTypeDropdown}']`);
+        const limitPriceXpath = await this.page.locator(`//tr/td[text()="Limit Price"]/td[text()='${this.limitPiceField}']`);
+        const stopPriceXpath = await this.page.locator(`//tr/td[text()="Stop Price"]/td[text()='${this.stopPriceField}']`);
+        const timeInForceXpath = await this.page.locator(`//tr/td[text()="Time in Force"]/td[text()='${this.timeInForceDropdown}']`);
+        const gtDateXpath = await this.page.locator(`//tr/td[text()="GT Date"]/td[text()='${this.dateField}']`);
+        if (accountXpath != null && symbolXpath != null && actionXpath != null && quantityXpath != null && orderTypeXpath != null && limitPriceXpath != null && stopPriceXpath != null && timeInForceXpath != null && gtDateXpath != null) {
+            console.log("All preview order details are correct");
+        } else {
 
+        }
     }
-   }
-   /**
-    * Use it to wait for an element to be visible and then click on it.
-    * Use it to wait for an element to be visible and then fill it with a value.
-    */
+    /**
+     * Use it to wait for an element to be visible and then click on it.
+     * Use it to wait for an element to be visible and then fill it with a value.
+     */
 
-   async waitForElementAndClick(locator: Locator, timeout: number = 5000) {
+    async waitForElementAndClick(locator: Locator, timeout: number = 5000) {
         try {
             await locator.waitFor({ state: 'visible', timeout });
             await locator.click();
@@ -264,9 +264,9 @@ async navigateTo(url?: string) {
             console.error(`Failed to click on element: ${await locator.textContent()}`, error);
             throw error;
         }
-   }
+    }
 
-   async waitForElementAndFill(locator: Locator, value: string, timeout: number = 5000) {
+    async waitForElementAndFill(locator: Locator, value: string, timeout: number = 5000) {
         try {
             await locator.waitFor({ state: 'visible', timeout });
             await locator.fill(value);
@@ -287,8 +287,8 @@ async navigateTo(url?: string) {
     async clickElementInIframe(selector: string) {
         await this.page.waitForLoadState('domcontentloaded');
         const frames = this.page.frames();
-        if( frames.length !== 0) {
-            const frame = frames[length - 1]; 
+        if (frames.length !== 0) {
+            const frame = frames[length - 1];
             await frame.waitForLoadState('domcontentloaded');
             await frame.locator(selector).waitFor({ state: 'visible', timeout: 5000 });
             const element: Locator = frame.locator(selector);
@@ -298,18 +298,18 @@ async navigateTo(url?: string) {
                 console.log(`Clicked on element in iframe: ${selector}`);
                 return;
             }
-        }else{
+        } else {
             for (const frame of frames) {
-            await frame.waitForLoadState('domcontentloaded');
-            await frame.locator(selector).waitFor({ state: 'visible', timeout: 5000 });
-            const element: Locator = frame.locator(selector);
-            if (!await element.isHidden()) {
-                await element.click();
-                await this.page.waitForLoadState('domcontentloaded');
-                console.log(`Clicked on element in iframe: ${selector}`);
-                return;
+                await frame.waitForLoadState('domcontentloaded');
+                await frame.locator(selector).waitFor({ state: 'visible', timeout: 5000 });
+                const element: Locator = frame.locator(selector);
+                if (!await element.isHidden()) {
+                    await element.click();
+                    await this.page.waitForLoadState('domcontentloaded');
+                    console.log(`Clicked on element in iframe: ${selector}`);
+                    return;
+                }
             }
-        }
         }
         console.error(`Element not found in any iframe: ${selector}`);
     }
@@ -325,7 +325,7 @@ async navigateTo(url?: string) {
             await frame.waitForLoadState('domcontentloaded');
             await frame.waitForSelector(selector, { state: 'visible' });
             const element = frame.locator(selector);
-            if (element!==null) {
+            if (element !== null) {
                 await element.fill(value);
                 console.log(`Filled element in iframe with value: ${value}`);
                 return;
@@ -344,17 +344,17 @@ async navigateTo(url?: string) {
         const frames = this.page.frames();
         for (const frame of frames) {
             await frame.waitForLoadState('domcontentloaded');
-            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+            await frame.waitForSelector(selector, { state: 'visible', timeout: 5000 });
             const element = frame.locator(selector);
-            if (element!== null) {
+            if (element !== null) {
                 const text = await element.textContent();
                 console.log(`Text from element in iframe: ${text}`);
-               
+
                 return text || '';
             }
         }
         console.error(`Element not found in any iframe: ${selector}`);
-        return '';        
+        return '';
     }
 
     /**
@@ -366,8 +366,8 @@ async navigateTo(url?: string) {
         const frames = this.page.frames();
         for (const frame of frames) {
             await frame.waitForLoadState('domcontentloaded');
-            
-            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+
+            await frame.waitForSelector(selector, { state: 'visible', timeout: 5000 });
             const element = frame.locator(selector);
             if (await element.isVisible()) {
                 console.log(`Element is visible in iframe: ${selector}`);
@@ -378,7 +378,7 @@ async navigateTo(url?: string) {
         return false;
     }
 
-    async validate(){
+    async validate() {
         return {
             isVisible: await this.isElementVisibleInIframe(''),
             text: await this.getTextFromElementInIframe('')
@@ -395,9 +395,9 @@ async navigateTo(url?: string) {
         const frames = this.page.frames();
         for (const frame of frames) {
             await frame.waitForLoadState('domcontentloaded');
-            await frame.waitForSelector(selector, { state: 'visible', timeout:5000 });
+            await frame.waitForSelector(selector, { state: 'visible', timeout: 5000 });
             const dropdown = frame.locator(selector);
-            if (dropdown!== null) {
+            if (dropdown !== null) {
                 await dropdown.selectOption({ label: value });
                 console.log(`Selected value "${value}" from dropdown in iframe: ${selector}`);
                 return;
@@ -405,6 +405,37 @@ async navigateTo(url?: string) {
         }
         console.error(`Dropdown not found in any iframe: ${selector}`);
     }
+
+    /**-------------------------12/10/2025--------------------------------------------------- */
+
+    /**
+     * Verifies a field value inside the Preview Order table.
+     *
+     * @param fieldName - The visible label in the left column ("Account Name", "Symbol", etc.)
+     * @param expectedValue - Expected text in the value column
+     *
+     */
+    async verifyPreviewOrderField(fieldName: string, expectedValue: string) {
+        // You are directly building the XPath and passing it
+        const valueXPath = `//div[contains(@class,"container visible")]//tr/td[text()="${fieldName}"]/following-sibling::td`;
+
+        // Fetch text inside iframe via your reusable function
+        const actualText: string = (await this.getTextFromElementInIframe(valueXPath))?.trim() ?? "";
+
+        // Compare
+        if (actualText !== expectedValue) {
+            throw new Error(
+                `❌ Verification failed for "${fieldName}". Expected: "${expectedValue}", Actual: "${actualText}"`
+            );
+            return false;
+        } else {
+            console.log(`✅ Verified "${fieldName}" = "${expectedValue}"`);
+            return true;
+        }
+    }
+
+    /**-------------------------12/10/2025--------------------------------------------------- */
+
 
 }
 export default HomePage;
