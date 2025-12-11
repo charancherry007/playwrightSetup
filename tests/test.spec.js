@@ -36,6 +36,7 @@ test.describe('Test case description', () => {
         })
         //**-------------------------12/10/2025--------------------------------------------------- */
 
+        await previewPage.verifyOrderDetails("Buy", { symbol: 'AAPL', quantity: '10' })
     });
 
     test.afterEach(async () => {
