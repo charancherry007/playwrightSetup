@@ -1,5 +1,6 @@
 import PageMaps from '../PageObjects/PageMaps';
 import CommonMethods from '../Utility/CommonMethods';
+import { PreviewPage } from '../pages/previewpage';
 const fs = require('fs');
 const path = require('path');
 const { XMLSerializer } = require('xmldom');
@@ -10,6 +11,7 @@ class LoginMethods {
   constructor(page) {
     this.page = page;
     this.Pages = new PageMaps(page);
+    this.PreviewPage = new PreviewPage(page);
     this.captureDOM();
   }
 
@@ -87,19 +89,19 @@ class LoginMethods {
   async signIn(username, password) {
     try {
       await this.page.waitForTimeout(2000);
-      
-        await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.usernameField, username, 'Email Field');
-        await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.passwordField, password, 'Password Field');
-        await CommonMethods.clickFunction(this.page, this.Pages.LoginPage.loginBtn, 'Login Button')
-        const currentUrl = this.page.url();
-        if (currentUrl.includes('dashboard')) { //change dashboard to the actual path you expect after login
-          console.log('Login Successfull');
-          return true;
-        } else {
-          console.log('User Name Input field not found');
-          return false;
-        }
-    
+
+      await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.usernameField, username, 'Email Field');
+      await CommonMethods.enterTextFunction(this.page, this.Pages.LoginPage.passwordField, password, 'Password Field');
+      await CommonMethods.clickFunction(this.page, this.Pages.LoginPage.loginBtn, 'Login Button')
+      const currentUrl = this.page.url();
+      if (currentUrl.includes('dashboard')) { //change dashboard to the actual path you expect after login
+        console.log('Login Successfull');
+        return true;
+      } else {
+        console.log('User Name Input field not found');
+        return false;
+      }
+
     } catch (err) {
       console.log('Error Performing Login Action ', err);
       return false;
@@ -123,10 +125,10 @@ class LoginMethods {
       if (!(await this.page.locator(orderTypeLocator).isVisible())) {
         console.log(`Order type ${orderType} not found.`);
         return false;
-      }else{
-      console.log(`Order type ${orderType} found Successfully.`);
-      await CommonMethods.clickFunction(this.page, orderTypeLocator, `${orderType} Order Type`);
-      return true;
+      } else {
+        console.log(`Order type ${orderType} found Successfully.`);
+        await CommonMethods.clickFunction(this.page, orderTypeLocator, `${orderType} Order Type`);
+        return true;
       }
     } catch (err) {
       console.log('Error Searching and Selecting Order Type ', err);
@@ -134,7 +136,7 @@ class LoginMethods {
     }
   }
 
-/**---------------------------------------------------- */
+  /**---------------------------------------------------- */
   /**
    * Search for an account with specified search type.
    */
@@ -145,11 +147,11 @@ class LoginMethods {
       const searchTypeLocator = `//li[@role='option']//p[contains(text(), '${searchType}')]`;
       await this.page.locator(searchTypeLocator).click();
       await this.accountSearchBox.fill(searchValue);
-      const  accountRow = `//tr[1]/td//div[text()='${searchValue}']`;
-      if(await this.page.locator(accountRow).isVisible()) {
+      const accountRow = `//tr[1]/td//div[text()='${searchValue}']`;
+      if (await this.page.locator(accountRow).isVisible()) {
         console.log(`Account ${searchValue} found successfully.`);
         await this.page.locator(accountRow).click();
-      }else{
+      } else {
         console.log(`Account ${searchValue} not found.`);
         return false;
       }
@@ -158,9 +160,25 @@ class LoginMethods {
       console.log('Error Searching Account ', err);
       return false;
     }
-}
+  }
 
-/**------------------------------------------------------ */
+  /**------------------------------------------------------ */
+
+  /**
+   * Verifies multiple fields in the preview order.
+   * @param {Object} expectedFields - Object containing field names and expected values.
+   */
+  async verifyPreviewOrderFields(expectedFields) {
+    try {
+      for (const [fieldName, expectedValue] of Object.entries(expectedFields)) {
+        await this.PreviewPage.verifyPreviewOrderField(fieldName, expectedValue);
+      }
+      return true;
+    } catch (error) {
+      console.error("Error verifying preview order fields:", error);
+      return false;
+    }
+  }
 
 }
 
