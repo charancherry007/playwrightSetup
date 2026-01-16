@@ -1,16 +1,18 @@
-import { test as base } from '@playwright/test';
+import { test, Page } from '@playwright/test';
 
-export const test = base.extend({
-    page: async ({ page }, use, testInfo) => {
-        await use(page);
+export async function step(
+    page: Page,
+    title: string,
+    action: () => Promise<void>
+) {
+    await test.step(title, async () => {
+        await action();
 
-        if (testInfo.status !== testInfo.expectedStatus) {
-            const screenshot = await page.screenshot({ fullPage: true });
+        const screenshot = await page.screenshot({ fullPage: true });
 
-            await testInfo.attach('Failure Screenshot', {
-                body: screenshot,
-                contentType: 'image/png'
-            });
-        }
-    }
-});
+        await test.info().attach(title, {
+            body: screenshot,
+            contentType: 'image/png'
+        });
+    });
+}
