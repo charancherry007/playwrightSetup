@@ -106,7 +106,7 @@ export class TradePage {
             await listItem.click();
 
             console.log(`Selected value "${value}" from custom dropdown in last iframe.`);
-        } catch (e) {
+        } catch (e: any) {
             console.error(`Failed to select value "${value}" from dropdown: ${dropdownSelector}`);
             throw new Error(`Failed to select value from dropdown. Error: ${e.message}`);
         }
@@ -123,6 +123,26 @@ export class TradePage {
             console.warn(`Could not check if element is enabled in last iframe: ${selector}`);
         }
         return false;
+    }
+
+    async isElementVisibleInIframe(selector: string): Promise<boolean> {
+        try {
+            const frame = await this.getLastFrame();
+            const element = frame.locator(selector).first();
+            return await element.isVisible({ timeout: 5000 });
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async isElementHiddenInIframe(selector: string): Promise<boolean> {
+        try {
+            const frame = await this.getLastFrame();
+            const element = frame.locator(selector).first();
+            return await element.isHidden({ timeout: 5000 });
+        } catch (e) {
+            return true;
+        }
     }
 
     /**

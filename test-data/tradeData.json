@@ -1,0 +1,63 @@
+{
+    "marketOrder": {
+        "symbol": "AAPL",
+        "action": "Buy",
+        "quantity": "10",
+        "orderType": "Market"
+    },
+    "limitOrder": {
+        "symbol": "MSFT",
+        "action": "Sell",
+        "quantity": "5",
+        "orderType": "Limit",
+        "stopLimitValue": "250.50",
+        "timeInForce": "Good Until Cancelled",
+        "dateOffset": 1,
+        "solicitedDiscretion": true
+    },
+    "limitDayOrder": {
+        "symbol": "GOOGL",
+        "action": "Buy",
+        "quantity": "2",
+        "orderType": "Limit",
+        "stopLimitValue": "140.00",
+        "timeInForce": "Day"
+    },
+    "tradeOrders": [
+        {
+            "symbol": "AAPL",
+            "action": "Buy",
+            "quantity": "10",
+            "orderType": "Market"
+        },
+        {
+            "symbol": "MSFT",
+            "action": "Sell",
+            "quantity": "5",
+            "orderType": "Limit",
+            "stopLimitValue": "250.50",
+            "timeInForce": "Good Until Cancelled",
+            "dateOffset": 1,
+            "solicitedDiscretion": true
+        },
+        {
+            "symbol": "GOOGL",
+            "action": "Buy",
+            "quantity": "2",
+            "orderType": "Limit",
+            "stopLimitValue": "140.00",
+            "timeInForce": "Day"
+        }
+    ],
+    "symbolTemplate": {
+        "action": "Buy",
+        "quantity": "100",
+        "orderType": "Market"
+    },
+    "symbols": [
+        "TSLA",
+        "META",
+        "NFLX",
+        "NVDA"
+    ]
+}
