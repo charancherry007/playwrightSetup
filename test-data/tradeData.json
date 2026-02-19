@@ -13,7 +13,16 @@
         "stopLimitValue": "250.50",
         "timeInForce": "Good Until Cancelled",
         "dateOffset": 1,
-        "solicitedDiscretion": true
+        "solicitedDiscretion": true,
+        /**19/02/1999*/
+        "sellAll": true,
+        "vsPurchase": {
+            "allocateAll": true,
+            "accounting": {
+                "option": "LIFO",
+                "quantity": "5"
+            }
+        }
     },
     "limitDayOrder": {
         "symbol": "GOOGL",

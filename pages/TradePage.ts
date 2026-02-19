@@ -9,6 +9,14 @@ export interface OrderDetails {
     timeInForce?: 'Day' | 'Good Until Through' | 'Good Until Cancelled';
     dateOffset?: number;
     solicitedDiscretion?: boolean;
+    sellAll?: boolean;
+    vsPurchase?: {
+        allocateAll?: boolean;
+        accounting?: {
+            option: string;
+            quantity: string;
+        };
+    };
 }
 
 export class TradePage {
@@ -29,7 +37,15 @@ export class TradePage {
         solicitedDiscretionBtn: '//button[contains(@id, "solicited") or contains(@id, "discretion")]',
         calendarBtn: '//button[contains(@class, "calendar")]',
         previewOrderBtn: '//button[text()="Preview Order"]',
-        dropdownListItem: (value: string) => `//li[contains(text(), "${value}")] | //div[contains(@class, "option") and contains(text(), "${value}")]`
+        dropdownListItem: (value: string) => `//li[contains(text(), "${value}")] | //div[contains(@class, "option") and contains(text(), "${value}")]`,
+        availableShares: '//div[contains(@class, "shares-available")]//span[contains(@class, "number")] | //span[contains(text(), "available")]',
+        sellAllLink: '//a[text()="Sell All"]',
+        vsPurchaseLink: '//a[text()="VS Purchase" or contains(text(), "Versus")]',
+        allocateAllCheckbox: '//input[@type="checkbox" and (contains(@id, "allocateAll") or contains(@name, "allocateAll"))]',
+        allocateToOrderInput: '//input[contains(@id, "allocateToOrder") or contains(@name, "allocateToOrder")]',
+        vsApplyBtn: '//button[text()="Apply"]',
+        accountingDropdown: '//select[contains(@id, "accounting") or contains(@name, "accounting")]',
+        vsQuantityInput: '//input[contains(@id, "vsQuantity") or contains(@placeholder, "Quantity")]'
     };
 
     constructor(page: Page) {
@@ -178,6 +194,29 @@ export class TradePage {
         // 3. Quantity input
         await this.fillElementInIframe(this.selectors.quantityInput, details.quantity);
 
+        //19/02/2022
+
+        // Sell All logic
+        if (details.sellAll) {
+            console.log('Sell All parameter is true. Performing Sell All operation.');
+            // Click to ensure dropdown is visible
+            await this.clickElementInIframe(this.selectors.quantityInput);
+
+            // Capture shares available number
+            const sharesAvailable = await this.getTextFromElementInIframe(this.selectors.availableShares);
+            console.log(`Shares available to sell: ${sharesAvailable}`);
+
+            // Click Sell All link
+            await this.clickElementInIframe(this.selectors.sellAllLink);
+            console.log('Clicked Sell All. Quantity field should be updated.');
+        }
+
+
+        // 6. VS Purchase logic
+        if (details.vsPurchase) {
+            await this.handleVsPurchase(details.vsPurchase);
+        }
+
         // 4. Order Type selection
         await this.selectValueFromDropdownInIframe(this.selectors.orderTypeDropdown, details.orderType);
 
@@ -215,6 +254,32 @@ export class TradePage {
         }
 
         console.log('Order details entry completed.');
+    }
+    //19/02/2022
+    private async handleVsPurchase(vsData: any) {
+        console.log('Handling VS Purchase popup flow.');
+        await this.clickElementInIframe(this.selectors.vsPurchaseLink);
+
+        // Flow 1: Allocate All
+        if (vsData.allocateAll) {
+            console.log('Performing VS Purchase: Allocate All flow.');
+            await this.clickElementInIframe(this.selectors.allocateAllCheckbox);
+
+            // Wait for text field to populate and capture quantity
+            const allocatedQty = await this.getTextFromElementInIframe(this.selectors.allocateToOrderInput);
+            console.log(`Captured Allocate to Order quantity: ${allocatedQty}`);
+
+            await this.clickElementInIframe(this.selectors.vsApplyBtn);
+        }
+
+        // Flow 2: Accounting Parameters
+        if (vsData.accounting) {
+            console.log('Performing VS Purchase: Accounting Parameters flow.');
+            // Using the existing selectValueFromDropdownInIframe logic but tailored for this popup
+            await this.selectValueFromDropdownInIframe(this.selectors.accountingDropdown, vsData.accounting.option);
+            await this.fillElementInIframe(this.selectors.vsQuantityInput, vsData.accounting.quantity);
+            await this.clickElementInIframe(this.selectors.vsApplyBtn);
+        }
     }
 
     private async handleCalendar(offset?: number) {
