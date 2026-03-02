@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Utility Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <aside>
+            <div class="logo">ANTIGRAVITY DB</div>
+            <nav>
+                <ul>
+                    <li class="active">Overview</li>
+                    <li>Mongo Explorer</li>
+                    <li>Postgres Queries</li>
+                    <li>Logs</li>
+                    <li>Configuration</li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <main>
+            <div class="header-row">
+                <h1>System Infrastructure</h1>
+                <div>
+                    <span class="status-dot"></span>
+                    <span style="color: var(--text-secondary); font-size: 14px;">Database Nodes Active</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Active Connections</div>
+                    <div class="stat-value">124</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Query Latency</div>
+                    <div class="stat-value">12ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Storage Used</div>
+                    <div class="stat-value">84.2 GB</div>
+                </div>
+            </div>
+
+            <div class="query-viewer">
+                <div class="header-row">
+                    <h3>Recent MongoDB Execution</h3>
+                    <button class="btn-primary">Execute Again</button>
+                </div>
+                <div class="query-box" style="margin-top: 10px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;">Collection: <span style="color: var(--accent-primary)">users</span></p>
+                    <pre><code>
+[
+  {
+    "_id": "64b1f...",
+    "username": "sdet_master",
+    "role": "admin",
+    "last_login": "2026-03-02T09:44:00Z"
+  }
+]
+                    </code></pre>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: auto;">
+                Powering next-gen automation frameworks with DatabaseManager.ts
+            </div>
+        </main>
+    </div>
+</body>
+</html>
