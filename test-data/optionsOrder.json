@@ -1,0 +1,29 @@
+{
+    "marketOrder": {
+        "symbol": "AAPL",
+        "strategy":"Buy To Sell",
+        "callPut":"Call",
+        "action": "Buy",
+        "quantity": "10",
+        "orderType": "Market",
+        "timeInForce":"Day"
+    },
+    "stopLimitOrder": {
+        "symbol": "AAPL",
+        "strategy":"Buy To Sell",
+        "callPut":"Call",
+        "action": "Buy",
+        "quantity": "10",
+        "orderType": "Stop Limit",
+        "timeInForce":"Good Through Cancelled"
+    },
+    "limitOrder": {
+        "symbol": "AAPL",
+        "strategy":"Buy To Sell",
+        "callPut":"Call",
+        "action": "Buy",
+        "quantity": "10",
+        "orderType": "Limit",
+        "timeInForce":"Good Through Cancelled"
+    }
+}
