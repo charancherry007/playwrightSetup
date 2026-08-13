@@ -253,4 +253,39 @@ export class SOEOptionsPage {
 
         console.log('Options Order details entry completed.');
     }
+
+    //13-08-2026
+    /**
+     * Selecte Expiration Date based on the Non Zero Bid Value.
+     */
+    async selectExpirationDateBasedOnBidValue() {
+        console.log('Selecting Expiration Date based on Non Zero Bid Value');
+        let bidValueNum = -1;    
+        let index= 0;
+        while (bidValueNum <= 0) {
+            await this.selectValueFromDropdownInIframe(this.selectors.expirationDropdown, index.toString());
+            const bidStr = await this.getTextFromElementInIframe(this.selectors.bidSpan);
+            bidValueNum = parseFloat(bidStr.replace(/[^0-9.-]+/g, ""));
+            if(bidValueNum != 0 && bidValueNum > 0) {
+                this.expirationValue = await this.getTextFromElementInIframe(this.selectors.expirationDropdown);
+                console.log(`Found Non Zero Bid Value: ${bidValueNum} at Expiration Index: ${index}`);
+                break;
+            }
+            index++;
+        }
+    }
+
+            // 3. Quantity input Logic
+        if (details.quantity) {
+            if(details.quantity === 'Sell All') {
+                console.warn('Quantity is set to "Sell All"');
+                await this.clickElementInIframe(this.selectors.quantityInput);
+                await this.clickElementInIframe(this.selectors.dropdownListItem('Sell All'));
+                this.quantityValue = await this.getTextFromElementInIframe(this.selectors.quantityInput);
+
+            }else{
+            this.quantity = details.quantity;
+            await this.fillElementInIframe(this.selectors.quantityInput, details.quantity);
+            }
+        }
 }
